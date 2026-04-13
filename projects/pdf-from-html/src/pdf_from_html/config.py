@@ -15,6 +15,7 @@ class Settings(SharedSettings):
     default_margin_left: str = "20mm"
     default_scale: float = 1.0
     default_print_background: bool = True
+    cookie_secret_key: str = "dev-secret-change-in-production"
 
 
 @lru_cache

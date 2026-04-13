@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}PDF from HTML{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/pico.min.css">
+    <script src="/static/js/htmx.min.js" defer></script>
+</head>
+<body>
+    <header class="container">
+        <nav>
+            <ul>
+                <li><strong>PDF from HTML</strong></li>
+            </ul>
+            {% if authenticated %}
+            <ul>
+                <li><a href="/ui/">Generate</a></li>
+                <li>
+                    <form method="POST" action="/ui/logout" style="margin:0">
+                        <button type="submit" class="outline secondary">Logout</button>
+                    </form>
+                </li>
+            </ul>
+            {% endif %}
+        </nav>
+    </header>
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

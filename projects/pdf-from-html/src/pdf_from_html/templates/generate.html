@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}Generate PDF — PDF from HTML{% endblock %}
+{% block content %}
+<article>
+    <header>
+        <h2>Generate PDF</h2>
+    </header>
+    <form id="pdf-form">
+        <label for="source">Source</label>
+        <select id="source" name="source">
+            <option value="raw">Raw HTML</option>
+            <option value="url">URL</option>
+        </select>
+
+        <div id="raw-input">
+            <label for="content">HTML Content</label>
+            <textarea id="content" name="content" rows="10"
+                      placeholder="<html><body><h1>Hello World</h1></body></html>"></textarea>
+        </div>
+        <div id="url-input" hidden>
+            <label for="content-url">URL</label>
+            <input type="url" id="content-url" name="content-url"
+                   placeholder="https://example.com">
+        </div>
+
+        <details>
+            <summary>PDF Options</summary>
+            <div class="grid">
+                <label>
+                    Format
+                    <select id="opt-format" name="format">
+                        <option value="A4" selected>A4</option>
+                        <option value="Letter">Letter</option>
+                        <option value="Legal">Legal</option>
+                        <option value="Tabloid">Tabloid</option>
+                    </select>
+                </label>
+                <label>
+                    Orientation
+                    <select id="opt-orientation" name="orientation">
+                        <option value="portrait" selected>Portrait</option>
+                        <option value="landscape">Landscape</option>
+                    </select>
+                </label>
+            </div>
+            <div class="grid">
+                <label>
+                    Scale
+                    <input type="number" id="opt-scale" name="scale"
+                           value="1.0" min="0.1" max="2.0" step="0.1">
+                </label>
+                <label>
+                    Page Ranges
+                    <input type="text" id="opt-page-ranges" name="page_ranges"
+                           placeholder="e.g. 1-3, 5">
+                </label>
+            </div>
+            <label>
+                <input type="checkbox" id="opt-background" name="print_background" checked>
+                Print background
+            </label>
+        </details>
+
+        <div id="error-message" role="alert"
+             style="color: var(--pico-color-red-500); display: none;"></div>
+        <div id="success-message" role="status"
+             style="color: var(--pico-color-green-500); display: none;"></div>
+
+        <button type="submit" id="submit-btn">Generate PDF</button>
+    </form>
+</article>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    const sourceSelect = document.getElementById("source");
+    const rawInput = document.getElementById("raw-input");
+    const urlInput = document.getElementById("url-input");
+    const form = document.getElementById("pdf-form");
+    const submitBtn = document.getElementById("submit-btn");
+    const errorDiv = document.getElementById("error-message");
+    const successDiv = document.getElementById("success-message");
+
+    sourceSelect.addEventListener("change", function () {
+        const isRaw = this.value === "raw";
+        rawInput.hidden = !isRaw;
+        urlInput.hidden = isRaw;
+    });
+
+    form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        errorDiv.style.display = "none";
+        successDiv.style.display = "none";
+        submitBtn.disabled = true;
+        submitBtn.setAttribute("aria-busy", "true");
+        submitBtn.textContent = "Generating\u2026";
+
+        const source = sourceSelect.value;
+        const content = source === "raw"
+            ? document.getElementById("content").value
+            : document.getElementById("content-url").value;
+
+        const options = {
+            format: document.getElementById("opt-format").value,
+            orientation: document.getElementById("opt-orientation").value,
+            scale: parseFloat(document.getElementById("opt-scale").value),
+            print_background: document.getElementById("opt-background").checked,
+        };
+        const pageRanges = document.getElementById("opt-page-ranges").value.trim();
+        if (pageRanges) options.page_ranges = pageRanges;
+
+        try {
+            const response = await fetch("/v1/generate/pdf", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ source: source, content: content, options: options }),
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                errorDiv.textContent = data.detail || "Failed to generate PDF";
+                errorDiv.style.display = "block";
+                return;
+            }
+
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "document.pdf";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            successDiv.textContent = "PDF downloaded successfully.";
+            successDiv.style.display = "block";
+        } catch (err) {
+            errorDiv.textContent = "Network error \u2014 please try again.";
+            errorDiv.style.display = "block";
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.removeAttribute("aria-busy");
+            submitBtn.textContent = "Generate PDF";
+        }
+    });
+})();
+</script>
+{% endblock %}
