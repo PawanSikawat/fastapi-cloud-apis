@@ -1,7 +1,11 @@
+import base64
+import hashlib
 import io
+import json
 
 import segno
 from PIL import Image
+from redis.asyncio import Redis
 
 from qr_code_generator.exceptions import InvalidDataError
 from qr_code_generator.schemas.generate import QRCodeRequest
@@ -68,4 +72,29 @@ def generate_qr(
     if logo_bytes and params.format == "png":
         content = _composite_logo(content, logo_bytes, params.logo_size_ratio)
 
+    return content
+
+
+def _cache_key(params: QRCodeRequest, logo_bytes: bytes | None) -> str:
+    """Compute deterministic cache key from all input parameters."""
+    payload = json.dumps(params.model_dump(mode="json"), sort_keys=True)
+    if logo_bytes:
+        payload += hashlib.sha256(logo_bytes).hexdigest()
+    return f"qr:{hashlib.sha256(payload.encode()).hexdigest()}"
+
+
+async def generate_qr_cached(
+    params: QRCodeRequest,
+    logo_bytes: bytes | None,
+    redis: Redis,
+    cache_ttl: int,
+) -> bytes:
+    """Generate QR code with Redis caching."""
+    key = _cache_key(params, logo_bytes)
+    cached = await redis.get(key)
+    if cached:
+        return base64.b64decode(cached)
+
+    content = generate_qr(params, logo_bytes=logo_bytes)
+    await redis.setex(key, cache_ttl, base64.b64encode(content).decode())
     return content

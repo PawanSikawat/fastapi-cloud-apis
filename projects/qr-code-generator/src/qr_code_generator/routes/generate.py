@@ -1,7 +1,7 @@
 import re
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, Form, UploadFile
+from fastapi import APIRouter, Depends, Form, Request, UploadFile
 from fastapi.responses import Response
 
 from qr_code_generator.config import Settings, get_settings
@@ -12,7 +12,7 @@ from qr_code_generator.exceptions import (
     LogoTooLargeError,
 )
 from qr_code_generator.schemas.generate import QRCodeRequest
-from qr_code_generator.services.generator import generate_qr
+from qr_code_generator.services.generator import generate_qr_cached
 
 router = APIRouter(prefix="/v1/generate", tags=["generate"])
 
@@ -53,6 +53,7 @@ async def _read_logo(
 
 @router.post("/qrcode")
 async def generate_qrcode(
+    request: Request,
     settings: SettingsDep,
     data: Annotated[str, Form(min_length=1, max_length=2953)],
     fmt: Annotated[Literal["png", "svg"], Form(alias="format")] = "png",
@@ -81,7 +82,8 @@ async def generate_qrcode(
         logo_size_ratio=logo_size_ratio,
     )
 
-    content = generate_qr(params, logo_bytes=logo_bytes)
+    redis = request.app.state.redis
+    content = await generate_qr_cached(params, logo_bytes, redis, settings.cache_ttl)
 
     return Response(
         content=content,
