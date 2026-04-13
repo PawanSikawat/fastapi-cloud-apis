@@ -11,10 +11,17 @@ dependencies = [
     "fastapi[standard]>=0.115.0",
     "pydantic-settings>=2.7.0",
     "dnspython>=2.7.0",
+    "shared",
 ]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/email_validation"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.uv.sources]
+shared = { path = "../../shared", editable = true }
 
 [dependency-groups]
 dev = [
@@ -22,6 +29,8 @@ dev = [
     "pytest-asyncio>=0.25.0",
     "mypy>=1.14.0",
     "ruff>=0.9.0",
+    "fakeredis>=2.26.0",
+    "aiosqlite>=0.21.0",
 ]
 
 [tool.pytest.ini_options]

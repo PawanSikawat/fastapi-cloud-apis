@@ -1,11 +1,9 @@
 from functools import lru_cache
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from shared.config import SharedSettings
 
 
-class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="EMAIL_VALIDATION_")
-
+class Settings(SharedSettings):
     smtp_timeout: float = 10.0
     dns_timeout: float = 5.0
     max_batch_size: int = 50
