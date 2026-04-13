@@ -19,14 +19,14 @@ ENV/
 *.swp
 *.swo
 
+# OS
+.DS_Store
+Thumbs.db
+
 # Environment
 .env
 .env.*
 !.env.example
-
-# OS
-.DS_Store
-Thumbs.db
 
 # Testing
 .coverage
