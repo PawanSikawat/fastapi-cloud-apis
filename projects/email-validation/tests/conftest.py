@@ -14,6 +14,7 @@ def _test_env(monkeypatch: pytest.MonkeyPatch) -> None:
     """Set env vars required by SharedSettings."""
     monkeypatch.setenv("APP_DATABASE_URL", "sqlite+aiosqlite:///:memory:")
     monkeypatch.setenv("APP_REDIS_URL", "redis://localhost")
+    monkeypatch.setenv("APP_COOKIE_SECRET_KEY", "test-cookie-secret")
 
 
 @pytest.fixture
