@@ -14,6 +14,7 @@ from shared import (
 from pdf_from_html.config import get_settings
 from pdf_from_html.exceptions import AppError, app_exception_handler
 from pdf_from_html.routes.generate import router as generate_router
+from pdf_from_html.routes.ui import router as ui_router
 from pdf_from_html.services.browser_pool import BrowserPool
 
 
@@ -47,10 +48,11 @@ def create_app() -> FastAPI:
     # Middleware stack (last added = outermost = runs first on request)
     app.add_middleware(MeteringMiddleware, api_name="pdf-from-html")
     app.add_middleware(RateLimitMiddleware)
-    app.add_middleware(AuthMiddleware)
+    app.add_middleware(AuthMiddleware, skip_prefixes=("/ui/login", "/ui/logout"))
     app.add_middleware(ChannelDetectMiddleware)
 
     app.include_router(generate_router)
+    app.include_router(ui_router)
 
     # DEVIATION: bare dict return instead of Pydantic model — health check
     # endpoint intentionally returns minimal unstructured response
