@@ -239,6 +239,19 @@ async def test_create_user(client: AsyncClient) -> None:
     assert response.json()["name"] == "Alice"
 ```
 
+## Skills
+
+Domain expertise is encoded in skill files under `skills/`:
+
+- `skills/api-business/` — Pricing strategies, competitor analysis, conversion optimization
+- `skills/shared-infra/` — Auth, billing, metering, rate limiting architecture
+- `skills/api-patterns/` — Data proxy, AI wrapper, document processor, generator, aggregator
+- `skills/fastapi-cloud/` — Deployment, scaling, monitoring on FastAPI Cloud
+- `skills/marketplace/` — RapidAPI publishing, documentation standards, SEO
+- `skills/api-catalog/` — API opportunity catalog, evaluation criteria, scoring
+
+**Consult the relevant skill before making domain decisions.**
+
 ## Keeping This File Up to Date
 
 Whenever you add a new project, change the workspace structure, introduce new patterns, or change any fundamental convention, update this file immediately.
