@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Email Validation{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/pico.min.css">
+    <script src="/static/js/htmx.min.js" defer></script>
+</head>
+<body>
+    <header class="container">
+        <nav>
+            <ul>
+                <li><strong>Email Validation</strong></li>
+            </ul>
+            {% if authenticated %}
+            <ul>
+                <li><a href="/ui/">Validate</a></li>
+                <li>
+                    <form method="POST" action="/ui/logout" style="margin:0">
+                        <button type="submit" class="outline secondary">Logout</button>
+                    </form>
+                </li>
+            </ul>
+            {% endif %}
+        </nav>
+    </header>
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

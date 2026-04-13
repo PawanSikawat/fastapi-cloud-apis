@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% block title %}Validate Email — Email Validation{% endblock %}
+{% block content %}
+<article>
+    <header>
+        <h2>Email Validation</h2>
+    </header>
+
+    <!-- Mode tabs -->
+    <div class="grid">
+        <button id="tab-single" class="contrast" onclick="switchTab('single')">Single Email</button>
+        <button id="tab-batch" class="outline contrast" onclick="switchTab('batch')">Batch (up to 50)</button>
+    </div>
+
+    <!-- Single email form -->
+    <form id="single-form">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" required
+               placeholder="user@example.com">
+        <button type="submit" id="single-btn">Validate</button>
+    </form>
+
+    <!-- Batch form (hidden by default) -->
+    <form id="batch-form" hidden>
+        <label for="emails">Email Addresses (one per line)</label>
+        <textarea id="emails" name="emails" rows="8"
+                  placeholder="user1@example.com&#10;user2@example.com&#10;user3@example.com"></textarea>
+        <button type="submit" id="batch-btn">Validate All</button>
+    </form>
+
+    <div id="error-message" role="alert"
+         style="color: var(--pico-color-red-500); display: none;"></div>
+
+    <!-- Single result -->
+    <div id="single-result" hidden>
+        <h3>Result</h3>
+        <table role="grid">
+            <tbody>
+                <tr><td><strong>Email</strong></td><td id="r-email"></td></tr>
+                <tr><td><strong>Result</strong></td><td id="r-result"></td></tr>
+                <tr><td><strong>Score</strong></td><td id="r-score"></td></tr>
+                <tr><td><strong>Deliverable</strong></td><td id="r-deliverable"></td></tr>
+                <tr><td><strong>Disposable</strong></td><td id="r-disposable"></td></tr>
+                <tr><td><strong>Role-based</strong></td><td id="r-role"></td></tr>
+                <tr><td><strong>Free Provider</strong></td><td id="r-free"></td></tr>
+            </tbody>
+        </table>
+        <details>
+            <summary>Detailed Checks</summary>
+            <table role="grid">
+                <tbody>
+                    <tr><td><strong>Syntax Valid</strong></td><td id="r-syntax-valid"></td></tr>
+                    <tr><td><strong>Syntax Reason</strong></td><td id="r-syntax-reason"></td></tr>
+                    <tr><td><strong>MX Valid</strong></td><td id="r-mx-valid"></td></tr>
+                    <tr><td><strong>MX Records</strong></td><td id="r-mx-records"></td></tr>
+                    <tr><td><strong>SMTP Verified</strong></td><td id="r-smtp-verified"></td></tr>
+                    <tr><td><strong>Catch-all</strong></td><td id="r-smtp-catchall"></td></tr>
+                    <tr><td><strong>SMTP Reason</strong></td><td id="r-smtp-reason"></td></tr>
+                </tbody>
+            </table>
+        </details>
+    </div>
+
+    <!-- Batch results -->
+    <div id="batch-result" hidden>
+        <h3>Results</h3>
+        <figure>
+            <table role="grid">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Result</th>
+                        <th>Score</th>
+                        <th>Deliverable</th>
+                        <th>Disposable</th>
+                        <th>Role</th>
+                        <th>Free</th>
+                    </tr>
+                </thead>
+                <tbody id="batch-tbody"></tbody>
+            </table>
+        </figure>
+    </div>
+</article>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    const singleForm = document.getElementById("single-form");
+    const batchForm = document.getElementById("batch-form");
+    const singleBtn = document.getElementById("single-btn");
+    const batchBtn = document.getElementById("batch-btn");
+    const errorDiv = document.getElementById("error-message");
+    const singleResult = document.getElementById("single-result");
+    const batchResult = document.getElementById("batch-result");
+
+    window.switchTab = function (tab) {
+        const isSingle = tab === "single";
+        singleForm.hidden = !isSingle;
+        batchForm.hidden = isSingle;
+        document.getElementById("tab-single").className = isSingle ? "contrast" : "outline contrast";
+        document.getElementById("tab-batch").className = isSingle ? "outline contrast" : "contrast";
+        singleResult.hidden = true;
+        batchResult.hidden = true;
+        errorDiv.style.display = "none";
+    };
+
+    function formatBool(val) {
+        if (val === true) return "\u2705 Yes";
+        if (val === false) return "\u274c No";
+        return "\u2014";
+    }
+
+    function renderSingle(data) {
+        document.getElementById("r-email").textContent = data.email;
+        document.getElementById("r-result").textContent = data.result;
+        document.getElementById("r-score").textContent = data.score.toFixed(2);
+        document.getElementById("r-deliverable").textContent = formatBool(data.is_deliverable);
+        document.getElementById("r-disposable").textContent = formatBool(data.is_disposable);
+        document.getElementById("r-role").textContent = formatBool(data.is_role_based);
+        document.getElementById("r-free").textContent = formatBool(data.is_free_provider);
+        document.getElementById("r-syntax-valid").textContent = formatBool(data.checks.syntax.valid);
+        document.getElementById("r-syntax-reason").textContent = data.checks.syntax.reason || "\u2014";
+        document.getElementById("r-mx-valid").textContent = formatBool(data.checks.mx.valid);
+        document.getElementById("r-mx-records").textContent = data.checks.mx.records.join(", ") || "\u2014";
+        document.getElementById("r-smtp-verified").textContent = formatBool(data.checks.smtp.verified);
+        document.getElementById("r-smtp-catchall").textContent = formatBool(data.checks.smtp.catch_all);
+        document.getElementById("r-smtp-reason").textContent = data.checks.smtp.reason || "\u2014";
+        singleResult.hidden = false;
+        batchResult.hidden = true;
+    }
+
+    function renderBatch(results) {
+        const tbody = document.getElementById("batch-tbody");
+        tbody.innerHTML = "";
+        results.forEach(function (r) {
+            const row = document.createElement("tr");
+            row.innerHTML =
+                "<td>" + r.email + "</td>" +
+                "<td>" + r.result + "</td>" +
+                "<td>" + r.score.toFixed(2) + "</td>" +
+                "<td>" + formatBool(r.is_deliverable) + "</td>" +
+                "<td>" + formatBool(r.is_disposable) + "</td>" +
+                "<td>" + formatBool(r.is_role_based) + "</td>" +
+                "<td>" + formatBool(r.is_free_provider) + "</td>";
+            tbody.appendChild(row);
+        });
+        batchResult.hidden = false;
+        singleResult.hidden = true;
+    }
+
+    async function submit(url, body, btn) {
+        errorDiv.style.display = "none";
+        btn.disabled = true;
+        btn.setAttribute("aria-busy", "true");
+        const origText = btn.textContent;
+        btn.textContent = "Validating\u2026";
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
+            if (!response.ok) {
+                const data = await response.json();
+                errorDiv.textContent = data.detail || "Validation failed";
+                errorDiv.style.display = "block";
+                return null;
+            }
+            return await response.json();
+        } catch (err) {
+            errorDiv.textContent = "Network error \u2014 please try again.";
+            errorDiv.style.display = "block";
+            return null;
+        } finally {
+            btn.disabled = false;
+            btn.removeAttribute("aria-busy");
+            btn.textContent = origText;
+        }
+    }
+
+    singleForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const email = document.getElementById("email").value.trim();
+        const data = await submit("/v1/validate/email", { email: email }, singleBtn);
+        if (data) renderSingle(data);
+    });
+
+    batchForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const raw = document.getElementById("emails").value.trim();
+        const emails = raw.split("\n").map(function (s) { return s.trim(); }).filter(Boolean);
+        if (emails.length === 0) {
+            errorDiv.textContent = "Enter at least one email address.";
+            errorDiv.style.display = "block";
+            return;
+        }
+        const data = await submit("/v1/validate/email/batch", { emails: emails }, batchBtn);
+        if (data) renderBatch(data.results);
+    });
+})();
+</script>
+{% endblock %}
