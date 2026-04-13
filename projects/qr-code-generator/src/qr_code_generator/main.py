@@ -15,6 +15,7 @@ from shared import (
 from qr_code_generator.config import get_settings
 from qr_code_generator.exceptions import AppError, app_exception_handler
 from qr_code_generator.middleware.cookie_auth import CookieToHeaderMiddleware
+from qr_code_generator.routes.generate import router as generate_router
 
 _STATIC_DIR = Path(__file__).resolve().parent / "static"
 
@@ -71,6 +72,7 @@ def create_app() -> FastAPI:
     app.add_middleware(CookieToHeaderMiddleware, secret_key=settings.cookie_secret_key)
 
     app.mount("/static", StaticFiles(directory=str(_STATIC_DIR)), name="static")
+    app.include_router(generate_router)
 
     # DEVIATION: bare dict return instead of Pydantic model — health check
     # endpoint intentionally returns minimal unstructured response
