@@ -10,12 +10,19 @@ _SKIP_PATHS = frozenset({"/health", "/docs", "/redoc", "/openapi.json", "/webhoo
 
 
 class AuthMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app: ASGIApp, skip_paths: frozenset[str] | None = None) -> None:
+    def __init__(
+        self,
+        app: ASGIApp,
+        skip_paths: frozenset[str] | None = None,
+        skip_prefixes: tuple[str, ...] = (),
+    ) -> None:
         super().__init__(app)
         self.skip_paths = skip_paths if skip_paths is not None else _SKIP_PATHS
+        self.skip_prefixes = skip_prefixes
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
-        if request.url.path in self.skip_paths:
+        path = request.url.path
+        if path in self.skip_paths or path.startswith(self.skip_prefixes):
             return await call_next(request)
 
         channel = getattr(request.state, "channel", "direct")
