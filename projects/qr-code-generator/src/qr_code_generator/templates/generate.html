@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% block title %}Generate QR Code{% endblock %}
+{% block content %}
+<article>
+    <header>
+        <h2>Generate QR Code</h2>
+    </header>
+    <form id="qr-form">
+        <label for="data">Data / URL</label>
+        <input type="text" id="data" name="data" required
+               placeholder="https://example.com or any text">
+
+        <div class="grid">
+            <label>
+                Format
+                <select id="format" name="format">
+                    <option value="png" selected>PNG</option>
+                    <option value="svg">SVG</option>
+                </select>
+            </label>
+            <label>
+                Size (px)
+                <input type="number" id="size" name="size"
+                       value="300" min="50" max="2000" step="50">
+            </label>
+        </div>
+
+        <details>
+            <summary>Advanced Options</summary>
+            <div class="grid">
+                <label>
+                    Error Correction
+                    <select id="error_correction" name="error_correction">
+                        <option value="L">L (7%)</option>
+                        <option value="M" selected>M (15%)</option>
+                        <option value="Q">Q (25%)</option>
+                        <option value="H">H (30%)</option>
+                    </select>
+                </label>
+                <label>
+                    Border (modules)
+                    <input type="number" id="border" name="border"
+                           value="4" min="0" max="10">
+                </label>
+            </div>
+            <div class="grid">
+                <label>
+                    Foreground Color
+                    <input type="color" id="foreground_color" name="foreground_color"
+                           value="#000000">
+                </label>
+                <label>
+                    Background Color
+                    <input type="color" id="background_color" name="background_color"
+                           value="#FFFFFF">
+                </label>
+            </div>
+        </details>
+
+        <details>
+            <summary>Logo (optional)</summary>
+            <label for="logo">Upload Logo (PNG, JPEG, or WEBP — max 500 KB)</label>
+            <input type="file" id="logo" name="logo"
+                   accept="image/png,image/jpeg,image/webp">
+            <p id="logo-error" role="alert"
+               style="color: var(--pico-color-red-500); display: none;"></p>
+            <label>
+                Logo Size Ratio
+                <input type="range" id="logo_size_ratio" name="logo_size_ratio"
+                       min="0.1" max="0.4" step="0.05" value="0.25">
+                <small id="ratio-display">25%</small>
+            </label>
+        </details>
+
+        <div id="error-message" role="alert"
+             style="color: var(--pico-color-red-500); display: none;"></div>
+
+        <button type="submit" id="submit-btn">Generate QR Code</button>
+    </form>
+
+    <div id="preview-section" style="display: none; text-align: center; margin-top: 2rem;">
+        <h3>Preview</h3>
+        <img id="preview-img" alt="Generated QR Code" style="max-width: 100%; border: 1px solid var(--pico-muted-border-color); border-radius: 4px;">
+        <br>
+        <a id="download-link" download="qrcode.png">
+            <button type="button" class="outline" style="margin-top: 1rem;">Download</button>
+        </a>
+    </div>
+</article>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    var form = document.getElementById("qr-form");
+    var submitBtn = document.getElementById("submit-btn");
+    var errorDiv = document.getElementById("error-message");
+    var previewSection = document.getElementById("preview-section");
+    var previewImg = document.getElementById("preview-img");
+    var downloadLink = document.getElementById("download-link");
+    var logoInput = document.getElementById("logo");
+    var logoError = document.getElementById("logo-error");
+    var ratioInput = document.getElementById("logo_size_ratio");
+    var ratioDisplay = document.getElementById("ratio-display");
+
+    var currentObjectUrl = null;
+
+    ratioInput.addEventListener("input", function () {
+        ratioDisplay.textContent = Math.round(this.value * 100) + "%";
+    });
+
+    logoInput.addEventListener("change", function () {
+        logoError.style.display = "none";
+        var file = this.files[0];
+        if (!file) return;
+
+        var maxSize = 500 * 1024;
+        if (file.size > maxSize) {
+            logoError.textContent = "Logo file exceeds 500 KB limit.";
+            logoError.style.display = "block";
+            this.value = "";
+            return;
+        }
+
+        var allowed = ["image/png", "image/jpeg", "image/webp"];
+        if (allowed.indexOf(file.type) === -1) {
+            logoError.textContent = "Only PNG, JPEG, and WEBP files are accepted.";
+            logoError.style.display = "block";
+            this.value = "";
+            return;
+        }
+    });
+
+    form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        errorDiv.style.display = "none";
+        previewSection.style.display = "none";
+        submitBtn.disabled = true;
+        submitBtn.setAttribute("aria-busy", "true");
+        submitBtn.textContent = "Generating\u2026";
+
+        var formData = new FormData();
+        formData.append("data", document.getElementById("data").value);
+        formData.append("format", document.getElementById("format").value);
+        formData.append("size", document.getElementById("size").value);
+        formData.append("error_correction", document.getElementById("error_correction").value);
+        formData.append("border", document.getElementById("border").value);
+        formData.append("foreground_color", document.getElementById("foreground_color").value);
+        formData.append("background_color", document.getElementById("background_color").value);
+        formData.append("logo_size_ratio", document.getElementById("logo_size_ratio").value);
+
+        var logoFile = logoInput.files[0];
+        if (logoFile) {
+            formData.append("logo", logoFile);
+        }
+
+        try {
+            var response = await fetch("/v1/generate/qrcode", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!response.ok) {
+                var data = await response.json();
+                errorDiv.textContent = data.detail || "Failed to generate QR code";
+                errorDiv.style.display = "block";
+                return;
+            }
+
+            if (currentObjectUrl) {
+                URL.revokeObjectURL(currentObjectUrl);
+            }
+
+            var blob = await response.blob();
+            currentObjectUrl = URL.createObjectURL(blob);
+            previewImg.src = currentObjectUrl;
+
+            var fmt = document.getElementById("format").value;
+            downloadLink.href = currentObjectUrl;
+            downloadLink.download = "qrcode." + fmt;
+            previewSection.style.display = "block";
+        } catch (err) {
+            errorDiv.textContent = "Network error \u2014 please try again.";
+            errorDiv.style.display = "block";
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.removeAttribute("aria-busy");
+            submitBtn.textContent = "Generate QR Code";
+        }
+    });
+})();
+</script>
+{% endblock %}
