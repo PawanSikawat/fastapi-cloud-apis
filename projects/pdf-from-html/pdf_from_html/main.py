@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from playwright.async_api import async_playwright
 from shared import (
@@ -25,12 +26,14 @@ _STATIC_DIR = Path(__file__).resolve().parent / "static"
 # Auth skip paths: default shared paths + public UI paths
 _AUTH_SKIP_PATHS = frozenset(
     {
+        "/",
         "/health",
         "/docs",
         "/redoc",
         "/openapi.json",
         "/webhooks/stripe",
         "/ui/login",
+        "/ui/logout",
     }
 )
 
@@ -97,6 +100,10 @@ def create_app() -> FastAPI:
     # Routers
     app.include_router(generate_router)
     app.include_router(ui_router)
+
+    @app.get("/", include_in_schema=False)
+    async def root() -> RedirectResponse:
+        return RedirectResponse("/ui/login", status_code=302)
 
     # DEVIATION: bare dict return instead of Pydantic model — health check
     # endpoint intentionally returns minimal unstructured response
