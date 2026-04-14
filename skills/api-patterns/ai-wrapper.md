@@ -18,7 +18,7 @@ When building an API that wraps a machine learning model or external AI service.
 ```
 projects/<name>/
 ├── pyproject.toml
-├── src/<package_name>/
+├── <package_name>/
 │   ├── main.py
 │   ├── config.py
 │   ├── routes/

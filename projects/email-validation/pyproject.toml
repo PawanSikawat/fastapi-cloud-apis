@@ -20,7 +20,7 @@ dependencies = [
 entrypoint = "email_validation.main:app"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/email_validation"]
+packages = ["email_validation"]
 
 [tool.hatch.metadata]
 allow-direct-references = true

@@ -18,7 +18,7 @@ When building an API that creates artifacts from parameters. Examples: QR codes,
 ```
 projects/<name>/
 ├── pyproject.toml
-├── src/<package_name>/
+├── <package_name>/
 │   ├── main.py
 │   ├── config.py
 │   ├── routes/

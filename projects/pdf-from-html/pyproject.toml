@@ -20,7 +20,7 @@ dependencies = [
 entrypoint = "pdf_from_html.main:app"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/pdf_from_html"]
+packages = ["pdf_from_html"]
 
 [tool.hatch.metadata]
 allow-direct-references = true

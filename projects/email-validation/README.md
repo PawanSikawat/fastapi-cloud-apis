@@ -49,7 +49,7 @@ export DATABASE_URL="sqlite+aiosqlite:///./dev.db"
 export REDIS_URL="redis://localhost:6379/0"
 
 # Start dev server
-uv run fastapi dev src/email_validation/main.py
+uv run fastapi dev email_validation/main.py
 ```
 
 - API docs: http://127.0.0.1:8000/docs
@@ -79,11 +79,11 @@ See the [root README](../../README.md) for the full list of shared environment v
 uv run pytest
 
 # Run with coverage
-uv run pytest --cov=src/email_validation --cov-report=term-missing
+uv run pytest --cov=email_validation --cov-report=term-missing
 
 # Lint and type check
 uv run ruff check . && uv run ruff format --check .
-uv run mypy src/
+uv run mypy email_validation/
 ```
 
 ## Dependencies

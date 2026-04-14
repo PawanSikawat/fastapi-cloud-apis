@@ -18,7 +18,7 @@ When building an API that combines data from multiple sources into a unified res
 ```
 projects/<name>/
 ├── pyproject.toml
-├── src/<package_name>/
+├── <package_name>/
 │   ├── main.py
 │   ├── config.py
 │   ├── routes/
