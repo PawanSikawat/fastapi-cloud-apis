@@ -11,6 +11,8 @@ class SharedSettings(BaseSettings):
     stripe_secret_key: str = ""
     stripe_webhook_secret: str = ""
     rapidapi_proxy_secret: str = ""
+    admin_email: str = "admin@local"
+    admin_api_key: str = ""
 
 
 @lru_cache
