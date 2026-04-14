@@ -19,7 +19,7 @@ dependencies = [
 ]
 
 [tool.fastapi]
-entrypoint = "src/qr_code_generator/main.py"
+entrypoint = "qr_code_generator.main:app"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/qr_code_generator"]

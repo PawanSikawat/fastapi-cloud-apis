@@ -17,7 +17,7 @@ dependencies = [
 ]
 
 [tool.fastapi]
-entrypoint = "src/email_validation/main.py"
+entrypoint = "email_validation.main:app"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/email_validation"]
