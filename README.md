@@ -36,7 +36,7 @@ All projects depend on the `shared/` package which provides:
 
 ## Prerequisites
 
-- Python 3.12+
+- Python 3.13+
 - [uv](https://docs.astral.sh/uv/) package manager
 - PostgreSQL (production) or SQLite (development/testing)
 - Redis
