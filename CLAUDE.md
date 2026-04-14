@@ -114,7 +114,7 @@ All data validation and serialization goes through Pydantic v2.
 
 | Layer | Pattern |
 |-------|---------|
-| **Config** | `pydantic_settings.BaseSettings` with `model_config = SettingsConfigDict(env_prefix="APP_")` |
+| **Config** | `pydantic_settings.BaseSettings` with `SettingsConfigDict()` (no env prefix — matches FastAPI Cloud conventions) |
 | **Request bodies** | `pydantic.BaseModel` subclasses in `schemas/` |
 | **Response models** | `pydantic.BaseModel` subclasses in `schemas/`, referenced in route `response_model` |
 | **Internal data** | Dataclasses or Pydantic models depending on validation needs |

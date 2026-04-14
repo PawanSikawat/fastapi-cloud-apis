@@ -12,9 +12,9 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 @pytest.fixture(autouse=True)
 def _test_env(monkeypatch: pytest.MonkeyPatch) -> None:
     """Set env vars required by SharedSettings."""
-    monkeypatch.setenv("APP_DATABASE_URL", "sqlite+aiosqlite:///:memory:")
-    monkeypatch.setenv("APP_REDIS_URL", "redis://localhost")
-    monkeypatch.setenv("APP_COOKIE_SECRET_KEY", "test-cookie-secret")
+    monkeypatch.setenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
+    monkeypatch.setenv("REDIS_URL", "redis://localhost")
+    monkeypatch.setenv("COOKIE_SECRET_KEY", "test-cookie-secret")
 
 
 @pytest.fixture
@@ -59,7 +59,7 @@ async def app():  # type: ignore[no-untyped-def]
 
 
 @pytest.fixture
-async def client(app) -> AsyncGenerator[AsyncClient, None]:  # type: ignore[no-untyped-def]
+async def client(app) -> AsyncGenerator[AsyncClient]:  # type: ignore[no-untyped-def]
     """HTTP client that automatically includes the test API key header."""
     api_key = app.state._test_api_key  # noqa: SLF001
     async with AsyncClient(

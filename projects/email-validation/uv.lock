@@ -203,7 +203,7 @@ requires-dist = [
     { name = "itsdangerous", specifier = ">=2.2.0" },
     { name = "jinja2", specifier = ">=3.1.0" },
     { name = "pydantic-settings", specifier = ">=2.7.0" },
-    { name = "shared", git = "https://github.com/PawanSikawat/fastapi-cloud-apis.git?subdirectory=shared" },
+    { name = "shared", git = "https://github.com/PawanSikawat/fastapi-cloud-apis.git?subdirectory=shared&branch=main" },
 ]
 
 [package.metadata.requires-dev]
@@ -1028,7 +1028,7 @@ wheels = [
 [[package]]
 name = "shared"
 version = "0.1.0"
-source = { git = "https://github.com/PawanSikawat/fastapi-cloud-apis.git?subdirectory=shared#fc44db0b3d79abcc1c39bf6d461731a0d282a53e" }
+source = { git = "https://github.com/PawanSikawat/fastapi-cloud-apis.git?subdirectory=shared&branch=main#f9fd023d121c2edf4bf83ba9cda26acd4354dce5" }
 dependencies = [
     { name = "asyncpg" },
     { name = "fastapi" },
