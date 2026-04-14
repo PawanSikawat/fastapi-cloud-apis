@@ -6,13 +6,28 @@ Each entry links to its GitHub issue for full details.
 
 ---
 
-## Tier 1 — Build Next (Score 4.0+)
+## Tier 1 — Build Next (Score 4.5+)
 
 ### Data Proxy / Enrichment
 
 | API | Demand | Margin | Competition | Complexity | Score | Issue |
 |-----|--------|--------|-------------|------------|-------|-------|
 | Email Validation | 5 | 5 | 3 | 5 | 4.55 | #1 |
+
+### Generators
+
+| API | Demand | Margin | Competition | Complexity | Score | Issue |
+|-----|--------|--------|-------------|------------|-------|-------|
+| QR Code Generator | 5 | 5 | 3 | 5 | 4.55 | #6 |
+
+---
+
+## Tier 2 — Build Soon (Score 4.0–4.49)
+
+### Data Proxy / Enrichment
+
+| API | Demand | Margin | Competition | Complexity | Score | Issue |
+|-----|--------|--------|-------------|------------|-------|-------|
 | IP Geolocation & Threat Intel | 5 | 4 | 3 | 4 | 4.15 | #2 |
 | URL Metadata Extraction | 4 | 4 | 4 | 4 | 4.00 | #5 |
 
@@ -20,7 +35,6 @@ Each entry links to its GitHub issue for full details.
 
 | API | Demand | Margin | Competition | Complexity | Score | Issue |
 |-----|--------|--------|-------------|------------|-------|-------|
-| QR Code Generator | 5 | 5 | 3 | 5 | 4.55 | #6 |
 | Barcode Generation | 4 | 5 | 4 | 5 | 4.35 | #10 |
 | Invoice/Receipt Generation | 4 | 5 | 4 | 4 | 4.20 | #8 |
 | PDF from HTML/Templates | 5 | 4 | 3 | 4 | 4.15 | #7 |
@@ -50,7 +64,7 @@ Each entry links to its GitHub issue for full details.
 
 ---
 
-## Tier 2 — Build Soon (Score 3.0–3.9)
+## Tier 3 — Backlog (Score 3.0–3.99)
 
 ### Data Proxy / Enrichment
 
@@ -64,6 +78,13 @@ Each entry links to its GitHub issue for full details.
 | API | Demand | Margin | Competition | Complexity | Score | Issue |
 |-----|--------|--------|-------------|------------|-------|-------|
 | Screenshot-as-a-Service | 5 | 3 | 3 | 3 | 3.70 | #9 |
+
+### Document Processors
+
+| API | Demand | Margin | Competition | Complexity | Score | Issue |
+|-----|--------|--------|-------------|------------|-------|-------|
+| Bank Statement Parser | 4 | 4 | 3 | 2 | 3.45 | #40 |
+| HTML/URL to Markdown | 4 | 4 | 2 | 3 | 3.35 | #41 |
 
 ### AI Wrappers
 
@@ -88,12 +109,6 @@ Each entry links to its GitHub issue for full details.
 |-----|--------|--------|-------------|------------|-------|-------|
 | Tax Rate Lookup | 4 | 4 | 3 | 4 | 3.80 | #26 |
 | Currency Conversion | 5 | 3 | 2 | 5 | 3.75 | #25 |
-
----
-
-## Tier 3 — Backlog (Score < 3.0)
-
-(Empty — all current ideas score 3.0+)
 
 ---
 
