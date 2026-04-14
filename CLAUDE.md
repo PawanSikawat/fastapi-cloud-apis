@@ -30,17 +30,16 @@ fastapi-cloud-apis/
 ├── projects/
 │   └── <project-name>/
 │       ├── pyproject.toml        # Project-level dependencies and config
-│       ├── src/
-│       │   └── <package_name>/
-│       │       ├── __init__.py
-│       │       ├── main.py       # FastAPI app factory, lifespan, router includes
-│       │       ├── config.py     # Pydantic Settings — env vars, validation
-│       │       ├── routes/       # Route modules grouped by domain
-│       │       ├── schemas/      # Pydantic request/response models
-│       │       ├── services/     # Business logic, external API clients
-│       │       ├── models/       # Database models (SQLAlchemy/SQLModel if needed)
-│       │       ├── dependencies/ # FastAPI dependency injection functions
-│       │       └── exceptions.py # Custom exception classes and handlers
+│       ├── <package_name>/
+│       │   ├── __init__.py
+│       │   ├── main.py       # FastAPI app factory, lifespan, router includes
+│       │   ├── config.py     # Pydantic Settings — env vars, validation
+│       │   ├── routes/       # Route modules grouped by domain
+│       │   ├── schemas/      # Pydantic request/response models
+│       │   ├── services/     # Business logic, external API clients
+│       │   ├── models/       # Database models (SQLAlchemy/SQLModel if needed)
+│       │   ├── dependencies/ # FastAPI dependency injection functions
+│       │   └── exceptions.py # Custom exception classes and handlers
 │       └── tests/
 │           ├── conftest.py
 │           ├── test_routes/
@@ -62,13 +61,13 @@ Each project under `projects/` is self-contained with its own `pyproject.toml`, 
 uv sync
 
 # Run dev server
-uv run fastapi dev src/<package_name>/main.py
+uv run fastapi dev <package_name>/main.py
 
 # Test
 uv run pytest
 
 # Test with coverage
-uv run pytest --cov=src/<package_name> --cov-report=term-missing
+uv run pytest --cov=<package_name> --cov-report=term-missing
 
 # Format
 uv run ruff format .
@@ -77,7 +76,7 @@ uv run ruff format .
 uv run ruff check . --fix
 
 # Type check
-uv run mypy src/
+uv run mypy <package_name>/
 ```
 
 ## Code Quality Standard

@@ -25,7 +25,7 @@ repos:
     hooks:
       - id: mypy
         name: mypy
-        entry: bash -c 'for dir in projects/*/; do if [ -f "$dir/pyproject.toml" ]; then (cd "$dir" && uv run mypy src/); fi; done'
+        entry: bash -c 'for dir in projects/*/; do if [ -f "$dir/pyproject.toml" ]; then pkg=$(basename "$dir" | tr "-" "_"); (cd "$dir" && uv run mypy "$pkg/"); fi; done'
         language: system
         pass_filenames: false
         types: [python]

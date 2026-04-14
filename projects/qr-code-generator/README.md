@@ -67,7 +67,7 @@ export DATABASE_URL="sqlite+aiosqlite:///./dev.db"
 export REDIS_URL="redis://localhost:6379/0"
 
 # Start dev server
-uv run fastapi dev src/qr_code_generator/main.py
+uv run fastapi dev qr_code_generator/main.py
 ```
 
 - API docs: http://127.0.0.1:8000/docs
@@ -97,11 +97,11 @@ See the [root README](../../README.md) for the full list of shared environment v
 uv run pytest
 
 # Run with coverage
-uv run pytest --cov=src/qr_code_generator --cov-report=term-missing
+uv run pytest --cov=qr_code_generator --cov-report=term-missing
 
 # Lint and type check
 uv run ruff check . && uv run ruff format --check .
-uv run mypy src/
+uv run mypy qr_code_generator/
 ```
 
 65 tests covering schemas, services, routes, caching, and UI (92% coverage).

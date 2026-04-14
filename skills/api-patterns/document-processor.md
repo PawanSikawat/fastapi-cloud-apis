@@ -18,7 +18,7 @@ When building an API that accepts a document (PDF, image, spreadsheet) and extra
 ```
 projects/<name>/
 ├── pyproject.toml
-├── src/<package_name>/
+├── <package_name>/
 │   ├── main.py
 │   ├── config.py
 │   ├── routes/

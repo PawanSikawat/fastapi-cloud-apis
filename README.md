@@ -59,7 +59,7 @@ export DATABASE_URL="sqlite+aiosqlite:///./dev.db"
 export REDIS_URL="redis://localhost:6379/0"
 
 # Start the dev server
-uv run fastapi dev src/qr_code_generator/main.py
+uv run fastapi dev qr_code_generator/main.py
 ```
 
 The API docs are available at `http://127.0.0.1:8000/docs` and the web UI at `http://127.0.0.1:8000/ui/login`.
@@ -73,7 +73,7 @@ cd projects/qr-code-generator
 uv run pytest
 
 # Run with coverage
-uv run pytest --cov=src/qr_code_generator --cov-report=term-missing
+uv run pytest --cov=qr_code_generator --cov-report=term-missing
 ```
 
 ### Code Quality
@@ -88,7 +88,7 @@ uv run ruff check . --fix
 uv run ruff format .
 
 # Type check
-uv run mypy src/
+uv run mypy qr_code_generator/
 ```
 
 ## Deploy to FastAPI Cloud

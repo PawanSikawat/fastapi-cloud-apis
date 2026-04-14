@@ -18,7 +18,7 @@ When building an API that fetches data from an external source, transforms it, a
 ```
 projects/<name>/
 ├── pyproject.toml
-├── src/<package_name>/
+├── <package_name>/
 │   ├── main.py
 │   ├── config.py
 │   ├── routes/
