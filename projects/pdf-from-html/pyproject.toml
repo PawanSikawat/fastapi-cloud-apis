@@ -17,7 +17,7 @@ dependencies = [
 ]
 
 [tool.fastapi]
-entrypoint = "src/pdf_from_html/main.py"
+entrypoint = "pdf_from_html.main:app"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pdf_from_html"]
