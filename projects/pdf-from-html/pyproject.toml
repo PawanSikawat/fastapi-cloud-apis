@@ -23,7 +23,7 @@ packages = ["src/pdf_from_html"]
 allow-direct-references = true
 
 [tool.uv.sources]
-shared = { path = "../../shared", editable = true }
+shared = { git = "https://github.com/PawanSikawat/fastapi-cloud-apis.git", subdirectory = "shared", branch = "main" }
 
 [dependency-groups]
 dev = [

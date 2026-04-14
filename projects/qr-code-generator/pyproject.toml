@@ -25,7 +25,7 @@ packages = ["src/qr_code_generator"]
 allow-direct-references = true
 
 [tool.uv.sources]
-shared = { path = "../../shared", editable = true }
+shared = { git = "https://github.com/PawanSikawat/fastapi-cloud-apis.git", subdirectory = "shared", branch = "main" }
 
 [dependency-groups]
 dev = [

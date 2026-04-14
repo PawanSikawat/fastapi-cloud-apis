@@ -59,7 +59,7 @@ uv run fastapi dev src/email_validation/main.py
 ## Deploy to FastAPI Cloud
 
 ```bash
-fastapi cloud deploy
+uv run fastapi cloud deploy
 ```
 
 Then configure environment variables in the FastAPI Cloud dashboard:
