@@ -319,6 +319,23 @@ _AUTH_SKIP_PATHS = frozenset({
 
 The `CookieToHeaderMiddleware` must skip redirect for both `/ui/login` and `/ui/logout` — logout must work even without a valid cookie.
 
+### Admin User Seeding
+
+Every app auto-creates an admin user and API key on startup via `setup_shared()`. This is handled entirely by the shared package — no per-project code needed.
+
+**Required env var on FastAPI Cloud:**
+- `ADMIN_API_KEY` — any string (e.g. `sk_<random>`). The app hashes it and registers it on startup. Idempotent — safe across restarts/redeployments.
+
+**Optional:**
+- `ADMIN_EMAIL` — defaults to `admin@local`
+
+The admin user gets `plan="admin"`. Tables are auto-created on startup via `Base.metadata.create_all` (idempotent).
+
+**Generate a key locally:**
+```bash
+python -c "import secrets; print(f'sk_{secrets.token_urlsafe(32)}')"
+```
+
 ### Deploy Command
 
 ```bash
@@ -331,6 +348,16 @@ uv run fastapi cloud deploy
 ```
 
 When prompted for directory, leave it **empty** (flat layout means the package is at the project root).
+
+### Deploy Checklist
+
+Before deploying a new project, verify these env vars are set in FastAPI Cloud:
+
+1. `DATABASE_URL` — auto-provisioned by FastAPI Cloud
+2. `REDIS_URL` — auto-provisioned by FastAPI Cloud
+3. `ADMIN_API_KEY` — your admin key (required for first login)
+4. `COOKIE_SECRET_KEY` — secret for signing session cookies
+5. `ADMIN_EMAIL` — optional, defaults to `admin@local`
 
 ## Skills
 
