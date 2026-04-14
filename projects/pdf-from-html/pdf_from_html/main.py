@@ -48,12 +48,13 @@ _AUTH_SKIP_PREFIXES = ("/static/",)
 
 
 async def _ensure_chromium() -> None:
-    """Download Chromium if the binary is missing (first deploy on FastAPI Cloud)."""
+    """Download Chromium and its OS dependencies if missing (first deploy on FastAPI Cloud)."""
     proc = await asyncio.create_subprocess_exec(
         sys.executable,
         "-m",
         "playwright",
         "install",
+        "--with-deps",
         "chromium",
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
