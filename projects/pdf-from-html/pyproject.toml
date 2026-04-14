@@ -10,7 +10,7 @@ requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]>=0.115.0",
     "pydantic-settings>=2.7.0",
-    "playwright>=1.52.0",
+    "xhtml2pdf>=0.2.17",
     "jinja2>=3.1.0",
     "itsdangerous>=2.2.0",
     "shared",

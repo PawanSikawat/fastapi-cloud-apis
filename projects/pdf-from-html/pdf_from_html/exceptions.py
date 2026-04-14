@@ -45,15 +45,6 @@ class RenderFailedError(AppError):
         )
 
 
-class BrowserPoolExhaustedError(AppError):
-    def __init__(self) -> None:
-        super().__init__(
-            status_code=503,
-            detail="All browser instances are busy — try again shortly",
-            error_code="POOL_EXHAUSTED",
-        )
-
-
 async def app_exception_handler(_request: Request, exc: AppError) -> JSONResponse:
     return JSONResponse(
         status_code=exc.status_code,

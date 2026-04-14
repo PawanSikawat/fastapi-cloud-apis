@@ -1,5 +1,4 @@
 from collections.abc import AsyncGenerator
-from unittest.mock import AsyncMock, MagicMock
 
 import fakeredis.aioredis
 import pytest
@@ -19,26 +18,8 @@ def _test_env(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 @pytest.fixture
-def mock_browser_pool() -> MagicMock:
-    """A mock BrowserPool whose acquire() yields a mock Page returning fake PDF bytes."""
-    pool = MagicMock()
-    mock_page = AsyncMock()
-    mock_page.pdf = AsyncMock(return_value=b"%PDF-1.4 fake pdf content")
-    mock_page.set_content = AsyncMock()
-    mock_page.goto = AsyncMock()
-
-    acquire_cm = AsyncMock()
-    acquire_cm.__aenter__ = AsyncMock(return_value=mock_page)
-    acquire_cm.__aexit__ = AsyncMock(return_value=False)
-    pool.acquire.return_value = acquire_cm
-    pool._mock_page = mock_page  # noqa: SLF001
-
-    return pool
-
-
-@pytest.fixture
-async def app(mock_browser_pool: MagicMock):  # type: ignore[no-untyped-def]
-    """Create app with test doubles for DB, Redis, and browser pool."""
+async def app():  # type: ignore[no-untyped-def]
+    """Create app with test doubles for DB and Redis."""
     from pdf_from_html.config import get_settings
 
     get_settings.cache_clear()
@@ -58,7 +39,6 @@ async def app(mock_browser_pool: MagicMock):  # type: ignore[no-untyped-def]
     application.state.db_session_factory = session_factory
     application.state.redis = fake_redis
     application.state.shared_settings = get_settings()
-    application.state.browser_pool = mock_browser_pool
 
     async with session_factory() as session:
         user = User(email="test@test.com")
