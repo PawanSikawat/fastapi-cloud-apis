@@ -79,9 +79,9 @@ Score = (Demand * 0.35) + (Margin * 0.25) + (Competition * 0.25) + (Complexity *
 
 | Tier | Score Range | Action |
 |------|------------|--------|
-| Tier 1 | 4.0+ | Build next — high priority |
-| Tier 2 | 3.0–3.9 | Build soon — queue after Tier 1 |
-| Tier 3 | < 3.0 | Backlog — revisit if conditions change |
+| Tier 1 | 4.5+ | Build next — highest priority |
+| Tier 2 | 4.0–4.49 | Build soon — queue after Tier 1 |
+| Tier 3 | 3.0–3.99 | Backlog — revisit if conditions change |
 
 ## Anti-Patterns
 
