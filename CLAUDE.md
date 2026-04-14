@@ -192,7 +192,7 @@ Use `async def` for all route handlers and service functions that perform I/O. U
 
 Always use the **latest stable versions** of Python, FastAPI, and all dependencies. When adding new dependencies, pull the newest published version. When modifying `pyproject.toml`, check if existing packages have newer versions and upgrade them. Avoid pinning to old versions unless there is a documented compatibility reason.
 
-- **Python**: 3.12+ (use latest stable)
+- **Python**: 3.13+ (use latest stable)
 - **Package manager**: `uv`
 - **Framework**: FastAPI with Uvicorn
 - **Linting/Formatting**: Ruff (replaces black, isort, flake8)
