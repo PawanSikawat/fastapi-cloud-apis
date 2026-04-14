@@ -1,3 +1,5 @@
+import asyncio
+import sys
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -45,10 +47,27 @@ _QUOTA_SKIP_PREFIXES = ("/ui/", "/static/")
 _AUTH_SKIP_PREFIXES = ("/static/",)
 
 
+async def _ensure_chromium() -> None:
+    """Download Chromium if the binary is missing (first deploy on FastAPI Cloud)."""
+    proc = await asyncio.create_subprocess_exec(
+        sys.executable,
+        "-m",
+        "playwright",
+        "install",
+        "chromium",
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    _, stderr = await proc.communicate()
+    if proc.returncode != 0:
+        raise RuntimeError(f"Chromium install failed: {stderr.decode()}")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     settings = get_settings()
     async with setup_shared(app, settings):
+        await _ensure_chromium()
         pw = await async_playwright().start()
         browser = await pw.chromium.launch()
         app.state.browser_pool = BrowserPool(browser, settings.browser_pool_size)
