@@ -25,6 +25,13 @@ packages = ["pdf_from_html"]
 [tool.hatch.metadata]
 allow-direct-references = true
 
+[tool.uv]
+# pycairo requires cairo C library at build time (pkg-config + libcairo2-dev)
+# which FastAPI Cloud's Docker build env doesn't provide. We don't need SVG
+# rendering in PDFs, so exclude it from the transitive dependency chain:
+# xhtml2pdf → svglib → rlpycairo → pycairo
+exclude-dependencies = ["pycairo"]
+
 [tool.uv.sources]
 shared = { git = "https://github.com/PawanSikawat/fastapi-cloud-apis.git", subdirectory = "shared", branch = "main" }
 
