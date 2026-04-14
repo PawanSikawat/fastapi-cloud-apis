@@ -45,8 +45,8 @@ uv sync
 uv run playwright install chromium
 
 # Set environment variables
-export APP_DATABASE_URL="sqlite+aiosqlite:///./dev.db"
-export APP_REDIS_URL="redis://localhost:6379/0"
+export DATABASE_URL="sqlite+aiosqlite:///./dev.db"
+export REDIS_URL="redis://localhost:6379/0"
 
 # Start dev server
 uv run fastapi dev src/pdf_from_html/main.py
@@ -66,9 +66,9 @@ Then configure environment variables in the FastAPI Cloud dashboard:
 
 | Variable | Description |
 |----------|-------------|
-| `APP_DATABASE_URL` | PostgreSQL connection string |
-| `APP_REDIS_URL` | Redis connection string |
-| `APP_COOKIE_SECRET_KEY` | Secret for web UI session cookies |
+| `DATABASE_URL` | PostgreSQL connection string |
+| `REDIS_URL` | Redis connection string |
+| `COOKIE_SECRET_KEY` | Secret for web UI session cookies |
 
 See the [root README](../../README.md) for the full list of shared environment variables.
 

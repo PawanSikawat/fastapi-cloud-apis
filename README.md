@@ -55,8 +55,8 @@ cd projects/qr-code-generator
 uv sync
 
 # Set required environment variables
-export APP_DATABASE_URL="sqlite+aiosqlite:///./dev.db"
-export APP_REDIS_URL="redis://localhost:6379/0"
+export DATABASE_URL="sqlite+aiosqlite:///./dev.db"
+export REDIS_URL="redis://localhost:6379/0"
 
 # Start the dev server
 uv run fastapi dev src/qr_code_generator/main.py
@@ -116,12 +116,12 @@ Set these in the [FastAPI Cloud dashboard](https://fastapi.cloud) for each deplo
 
 | Variable | Description |
 |----------|-------------|
-| `APP_DATABASE_URL` | PostgreSQL connection string (`postgresql+asyncpg://...`) |
-| `APP_REDIS_URL` | Redis connection string |
-| `APP_STRIPE_SECRET_KEY` | Stripe secret key for billing |
-| `APP_STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
-| `APP_RAPIDAPI_PROXY_SECRET` | RapidAPI proxy secret (if publishing to RapidAPI) |
-| `APP_COOKIE_SECRET_KEY` | Secret for signing web UI session cookies |
+| `DATABASE_URL` | PostgreSQL connection string (`postgresql+asyncpg://...`) |
+| `REDIS_URL` | Redis connection string |
+| `STRIPE_SECRET_KEY` | Stripe secret key for billing |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
+| `RAPIDAPI_PROXY_SECRET` | RapidAPI proxy secret (if publishing to RapidAPI) |
+| `COOKIE_SECRET_KEY` | Secret for signing web UI session cookies |
 
 ### 4. Verify deployment
 

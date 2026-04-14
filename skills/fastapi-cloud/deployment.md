@@ -46,16 +46,16 @@ asyncio_mode = "auto"
 
 ```env
 # Injected by FastAPI Cloud
-APP_DATABASE_URL=postgresql+asyncpg://user:pass@host:5432/dbname
-APP_REDIS_URL=redis://host:6379/0
+DATABASE_URL=postgresql+asyncpg://user:pass@host:5432/dbname
+REDIS_URL=redis://host:6379/0
 
 # Configure in FastAPI Cloud dashboard
-APP_STRIPE_SECRET_KEY=sk_test_...
-APP_STRIPE_WEBHOOK_SECRET=whsec_...
-APP_RAPIDAPI_PROXY_SECRET=your-proxy-secret
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+RAPIDAPI_PROXY_SECRET=your-proxy-secret
 
 # Project-specific
-APP_PROJECT_NAME=email-validator
+PROJECT_NAME=email-validator
 ```
 
 ### Config Pattern
@@ -65,7 +65,7 @@ from functools import cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="APP_")
+    model_config = SettingsConfigDict()
 
     database_url: str
     redis_url: str
@@ -84,13 +84,13 @@ def get_settings() -> Settings:
 - **Hardcoding connection strings.** Even for development. Use `.env` files locally, FastAPI Cloud dashboard in production.
 - **Multiple FastAPI apps in one deployment.** Each project deploys separately. Don't try to serve multiple APIs from one app.
 - **Committing `.env` files.** `.env` is in `.gitignore`. Only `.env.example` (with placeholder values) is committed.
-- **Installing shared as a git submodule.** Path dependency is simpler and faster. `shared @ file://../../shared` works locally and on FastAPI Cloud.
+- **Installing shared as a git submodule.** Use a git URL dependency: `shared` with `[tool.uv.sources]` pointing to the repo's `shared/` subdirectory.
 
 ## Checklist
 
 - [ ] `pyproject.toml` includes `shared` as path dependency
 - [ ] `.env.example` documents all required environment variables
 - [ ] `.env` is in `.gitignore`
-- [ ] Pydantic Settings class uses `env_prefix="APP_"`
+- [ ] Pydantic Settings class uses `SettingsConfigDict()` (no env prefix)
 - [ ] Settings loaded via `@cache`-decorated function
 - [ ] `main.py` has a `FastAPI()` instance at module level

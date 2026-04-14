@@ -18,6 +18,9 @@ dependencies = [
     "shared",
 ]
 
+[tool.fastapi]
+entrypoint = "qr_code_generator.main:app"
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/qr_code_generator"]
 
