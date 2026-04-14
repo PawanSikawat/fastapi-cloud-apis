@@ -105,10 +105,10 @@ pip install fastapi-cli
 
 ```bash
 cd projects/qr-code-generator
-fastapi cloud deploy
+uv run fastapi cloud deploy
 ```
 
-FastAPI Cloud auto-discovers the `app` instance in `main.py`. The `shared/` package is installed automatically as a path dependency.
+FastAPI Cloud auto-discovers the `app` instance in `main.py`. The `shared/` package is installed automatically as a git dependency.
 
 ### 3. Configure environment variables
 
