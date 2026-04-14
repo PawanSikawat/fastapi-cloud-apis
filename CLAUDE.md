@@ -238,6 +238,100 @@ async def test_create_user(client: AsyncClient) -> None:
     assert response.json()["name"] == "Alice"
 ```
 
+## FastAPI Cloud Deployment
+
+Every project must be deployable to FastAPI Cloud out of the box. Follow these conventions when building new projects:
+
+### Project Layout (Flat, Not src/)
+
+Use **flat layout** — the package directory sits at the project root, NOT inside `src/`. This is critical for FastAPI Cloud's module discovery.
+
+```
+projects/<project-name>/
+├── pyproject.toml
+├── <package_name>/       # ← flat layout, directly importable
+│   ├── __init__.py
+│   ├── main.py
+│   └── ...
+└── tests/
+```
+
+**Never use `src/` layout** for deployed apps. It breaks FastAPI Cloud's auto-import unless you configure the directory setting.
+
+### pyproject.toml Requirements
+
+```toml
+[tool.fastapi]
+entrypoint = "<package_name>.main:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["<package_name>"]
+```
+
+- Entrypoint must use **module import format** (`package.main:app`), not file paths
+- The `app` object must be a module-level variable in `main.py` (via `app = create_app()`)
+
+### Environment Variables (No Prefix)
+
+FastAPI Cloud auto-provisions `DATABASE_URL` and `REDIS_URL` without any prefix. Pydantic Settings must use **no env prefix**:
+
+```python
+class SharedSettings(BaseSettings):
+    model_config = SettingsConfigDict()  # no env_prefix
+    database_url: str
+    redis_url: str
+```
+
+### Database URL Normalization
+
+FastAPI Cloud sets `DATABASE_URL` with `postgresql://` scheme, but async SQLAlchemy needs `postgresql+asyncpg://`. The shared package auto-normalizes this in `shared/database.py`.
+
+### Root URL Redirect
+
+Every project must redirect `GET /` to `/ui/login`:
+
+```python
+@app.get("/", include_in_schema=False)
+async def root() -> RedirectResponse:
+    return RedirectResponse("/ui/login", status_code=302)
+```
+
+Add `"/"` to `_AUTH_SKIP_PATHS`.
+
+### Auth Skip Paths
+
+These paths must always be in `_AUTH_SKIP_PATHS`:
+
+```python
+_AUTH_SKIP_PATHS = frozenset({
+    "/",
+    "/health",
+    "/docs",
+    "/redoc",
+    "/openapi.json",
+    "/webhooks/stripe",
+    "/ui/login",
+    "/ui/logout",
+})
+```
+
+### Cookie Middleware
+
+The `CookieToHeaderMiddleware` must skip redirect for both `/ui/login` and `/ui/logout` — logout must work even without a valid cookie.
+
+### Deploy Command
+
+```bash
+# From repo root:
+./deploy.sh <project-name>
+
+# Or manually from project directory:
+uv lock --upgrade-package shared
+uv run fastapi cloud deploy
+```
+
+When prompted for directory, leave it **empty** (flat layout means the package is at the project root).
+
 ## Skills
 
 Domain expertise is encoded in skill files under `skills/`:
