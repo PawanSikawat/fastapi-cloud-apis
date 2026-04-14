@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "email-validation"
 version = "0.1.0"
 description = "Email Validation API — syntax, MX, SMTP verification, disposable & role-based detection"
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]>=0.115.0",
     "pydantic-settings>=2.7.0",
@@ -40,13 +40,13 @@ asyncio_mode = "auto"
 testpaths = ["tests"]
 
 [tool.ruff]
-target-version = "py312"
+target-version = "py313"
 line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "UP", "B", "A", "SIM", "TCH"]
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.13"
 strict = true
 plugins = ["pydantic.mypy"]
