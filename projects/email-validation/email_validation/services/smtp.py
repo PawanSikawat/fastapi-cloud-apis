@@ -2,10 +2,14 @@ import asyncio
 
 
 async def _read_response(reader: asyncio.StreamReader) -> tuple[int, str]:
-    """Read an SMTP response, handling multi-line replies."""
+    """Read an SMTP response, handling multi-line replies.
+
+    No per-read timeout here — the caller wraps the entire SMTP session
+    in a single ``asyncio.wait_for`` so the overall budget is enforced.
+    """
     lines: list[str] = []
     while True:
-        raw = await asyncio.wait_for(reader.readline(), timeout=10.0)
+        raw = await reader.readline()
         line = raw.decode("utf-8", errors="replace").strip()
         lines.append(line)
         # Multi-line responses use "250-" prefix; final line uses "250 "
@@ -104,9 +108,12 @@ async def verify_smtp(
         return None, None, f"SMTP connection failed: {e}"
 
     try:
-        return await _run_smtp_session(email, reader, writer)
+        return await asyncio.wait_for(
+            _run_smtp_session(email, reader, writer),
+            timeout=timeout,
+        )
     except TimeoutError:
-        return None, None, "SMTP connection timed out"
+        return None, None, "SMTP session timed out"
     except OSError as e:
         return None, None, f"SMTP connection failed: {e}"
     finally:
