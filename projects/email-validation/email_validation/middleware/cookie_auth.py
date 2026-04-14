@@ -4,6 +4,7 @@ from starlette.responses import RedirectResponse
 from starlette.types import ASGIApp, Receive, Scope, Send
 
 _LOGIN_PATH = "/ui/login"
+_LOGOUT_PATH = "/ui/logout"
 _UI_PREFIX = "/ui/"
 
 
@@ -47,7 +48,7 @@ class CookieToHeaderMiddleware:
             return
 
         # No valid credential — redirect to login for UI paths
-        if path.startswith(_UI_PREFIX) and path != _LOGIN_PATH:
+        if path.startswith(_UI_PREFIX) and path not in {_LOGIN_PATH, _LOGOUT_PATH}:
             response = RedirectResponse(_LOGIN_PATH)
             await response(scope, receive, send)
             return
