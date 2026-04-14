@@ -4,7 +4,6 @@ from shared.config import SharedSettings
 
 
 class Settings(SharedSettings):
-    browser_pool_size: int = 3
     render_timeout: float = 30.0
     max_content_size: int = 5_242_880
     default_format: str = "A4"

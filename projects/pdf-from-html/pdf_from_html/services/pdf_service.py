@@ -1,83 +1,74 @@
-from playwright._impl._api_structures import PdfMargins
-from playwright.async_api import Error as PlaywrightError
-from playwright.async_api import TimeoutError as PlaywrightTimeoutError
-from typing_extensions import TypedDict
+import asyncio
+import io
+
+import httpx
+from xhtml2pdf import pisa
 
 from pdf_from_html.exceptions import RenderFailedError, RenderTimeoutError
 from pdf_from_html.schemas.generate import PDFOptions
-from pdf_from_html.services.browser_pool import BrowserPool
+
+# Map API format names to CSS @page size keywords
+_FORMAT_TO_CSS: dict[str, str] = {
+    "A4": "a4",
+    "Letter": "letter",
+    "Legal": "legal",
+    "Tabloid": "11in 17in",
+}
 
 
-class _PdfKwargs(TypedDict, total=False):
-    """Typed kwargs for Playwright Page.pdf() — keeps mypy happy on **-unpacking."""
+def _build_page_css(options: PDFOptions) -> str:
+    """Build a CSS @page rule from PDFOptions."""
+    rules: list[str] = []
 
-    format: str | None
-    landscape: bool | None
-    scale: float | None
-    print_background: bool | None
-    margin: PdfMargins | None
-    page_ranges: str | None
-    display_header_footer: bool | None
-    header_template: str | None
-    footer_template: str | None
-    width: str | float | None
-    height: str | float | None
+    if options.width is not None and options.height is not None:
+        size = f"{options.width} {options.height}"
+    else:
+        size = _FORMAT_TO_CSS.get(options.format, "a4")
+
+    if options.orientation == "landscape":
+        size += " landscape"
+
+    rules.append(f"size: {size}")
+    rules.append(
+        f"margin: {options.margin.top} {options.margin.right} "
+        f"{options.margin.bottom} {options.margin.left}"
+    )
+
+    return f"@page {{ {'; '.join(rules)} }}"
 
 
-def _build_pdf_options(options: PDFOptions) -> _PdfKwargs:
-    """Convert PDFOptions into Playwright page.pdf() kwargs."""
-    margin: PdfMargins = {
-        "top": options.margin.top,
-        "right": options.margin.right,
-        "bottom": options.margin.bottom,
-        "left": options.margin.left,
-    }
+def _render_pdf(source: str, content: str, options: PDFOptions) -> bytes:
+    """Synchronous PDF rendering via xhtml2pdf (runs in a thread)."""
+    if source == "url":
+        response = httpx.get(content, follow_redirects=True, timeout=30.0)
+        response.raise_for_status()
+        html_content = response.text
+    else:
+        html_content = content
 
-    pdf_opts: _PdfKwargs = {
-        "format": options.format,
-        "landscape": options.orientation == "landscape",
-        "margin": margin,
-        "scale": options.scale,
-        "print_background": options.print_background,
-    }
+    page_css = _build_page_css(options)
+    output = io.BytesIO()
+    status = pisa.CreatePDF(html_content, dest=output, default_css=page_css)
 
-    if options.page_ranges is not None:
-        pdf_opts["page_ranges"] = options.page_ranges
+    if status.err:
+        raise RuntimeError(f"PDF generation produced {status.err} errors")
 
-    if options.header_html is not None or options.footer_html is not None:
-        pdf_opts["display_header_footer"] = True
-        if options.header_html is not None:
-            pdf_opts["header_template"] = options.header_html
-        if options.footer_html is not None:
-            pdf_opts["footer_template"] = options.footer_html
-
-    if options.width is not None:
-        pdf_opts["width"] = options.width
-    if options.height is not None:
-        pdf_opts["height"] = options.height
-
-    return pdf_opts
+    return output.getvalue()
 
 
 async def generate(
     source: str,
     content: str,
     options: PDFOptions,
-    pool: BrowserPool,
     timeout: float,
 ) -> bytes:
     """Generate a PDF from HTML content or URL."""
-    async with pool.acquire() as page:
-        timeout_ms = timeout * 1000
-        try:
-            if source == "url":
-                await page.goto(content, wait_until="networkidle", timeout=timeout_ms)
-            else:
-                await page.set_content(content, wait_until="networkidle", timeout=timeout_ms)
-
-            pdf_options = _build_pdf_options(options)
-            return await page.pdf(**pdf_options)
-        except PlaywrightTimeoutError:
-            raise RenderTimeoutError(timeout) from None
-        except PlaywrightError as exc:
-            raise RenderFailedError(str(exc)) from None
+    try:
+        return await asyncio.wait_for(
+            asyncio.to_thread(_render_pdf, source, content, options),
+            timeout=timeout,
+        )
+    except TimeoutError:
+        raise RenderTimeoutError(timeout) from None
+    except Exception as exc:
+        raise RenderFailedError(str(exc)) from None

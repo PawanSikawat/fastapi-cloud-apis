@@ -1,5 +1,3 @@
-import asyncio
-import sys
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -7,7 +5,6 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from playwright.async_api import async_playwright
 from shared import (
     AuthMiddleware,
     ChannelDetectMiddleware,
@@ -21,7 +18,6 @@ from pdf_from_html.exceptions import AppError, app_exception_handler
 from pdf_from_html.middleware.cookie_auth import CookieToHeaderMiddleware
 from pdf_from_html.routes.generate import router as generate_router
 from pdf_from_html.routes.ui import router as ui_router
-from pdf_from_html.services.browser_pool import BrowserPool
 
 _STATIC_DIR = Path(__file__).resolve().parent / "static"
 
@@ -47,36 +43,11 @@ _QUOTA_SKIP_PREFIXES = ("/ui/", "/static/")
 _AUTH_SKIP_PREFIXES = ("/static/",)
 
 
-async def _ensure_chromium() -> None:
-    """Download Chromium and its OS dependencies if missing (first deploy on FastAPI Cloud)."""
-    proc = await asyncio.create_subprocess_exec(
-        sys.executable,
-        "-m",
-        "playwright",
-        "install",
-        "--with-deps",
-        "chromium",
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    _, stderr = await proc.communicate()
-    if proc.returncode != 0:
-        raise RuntimeError(f"Chromium install failed: {stderr.decode()}")
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     settings = get_settings()
     async with setup_shared(app, settings):
-        await _ensure_chromium()
-        pw = await async_playwright().start()
-        browser = await pw.chromium.launch()
-        app.state.browser_pool = BrowserPool(browser, settings.browser_pool_size)
-        try:
-            yield
-        finally:
-            await app.state.browser_pool.close()
-            await pw.stop()
+        yield
 
 
 def create_app() -> FastAPI:
@@ -85,8 +56,8 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="PDF from HTML API",
         description=(
-            "Generate PDFs from raw HTML or URLs using Chromium. "
-            "Pixel-perfect rendering with full CSS3 and JavaScript support."
+            "Generate PDFs from raw HTML or URLs using WeasyPrint. "
+            "High-fidelity rendering with full CSS3 support."
         ),
         version="0.1.0",
         lifespan=lifespan,

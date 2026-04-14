@@ -1,5 +1,5 @@
 import io
-from typing import TYPE_CHECKING, Annotated
+from typing import Annotated
 from urllib.parse import urlparse
 
 from fastapi import APIRouter, Depends, Request
@@ -9,9 +9,6 @@ from pdf_from_html.config import Settings, get_settings
 from pdf_from_html.exceptions import ContentTooLargeError, InvalidURLError
 from pdf_from_html.schemas.generate import PDFGenerateRequest
 from pdf_from_html.services.pdf_service import generate
-
-if TYPE_CHECKING:
-    from pdf_from_html.services.browser_pool import BrowserPool
 
 router = APIRouter(prefix="/v1/generate", tags=["generate"])
 
@@ -37,12 +34,10 @@ async def generate_pdf(
     elif len(body.content.encode("utf-8")) > settings.max_content_size:
         raise ContentTooLargeError(settings.max_content_size)
 
-    pool: BrowserPool = request.app.state.browser_pool
     pdf_bytes = await generate(
         source=body.source,
         content=body.content,
         options=body.options,
-        pool=pool,
         timeout=settings.render_timeout,
     )
 
