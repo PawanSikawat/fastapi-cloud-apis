@@ -1187,7 +1187,7 @@ wheels = [
 [[package]]
 name = "shared"
 version = "0.1.0"
-source = { git = "https://github.com/PawanSikawat/fastapi-cloud-apis.git?subdirectory=shared&branch=main#70978b04174f36b09c2a85cd7dfd428f9fa451be" }
+source = { git = "https://github.com/PawanSikawat/fastapi-cloud-apis.git?subdirectory=shared&branch=main#6c4cbe314c059a831a9d271d3276450bc7efa42b" }
 dependencies = [
     { name = "asyncpg" },
     { name = "fastapi" },
