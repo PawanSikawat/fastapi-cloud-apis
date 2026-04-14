@@ -284,7 +284,7 @@ class SharedSettings(BaseSettings):
 
 ### Database URL Normalization
 
-FastAPI Cloud sets `DATABASE_URL` with `postgresql://` scheme, but async SQLAlchemy needs `postgresql+asyncpg://`. The shared package auto-normalizes this in `shared/database.py`.
+FastAPI Cloud sets `DATABASE_URL` with `postgresql://` scheme and `?sslmode=require`, but async SQLAlchemy with asyncpg needs `postgresql+asyncpg://` and does not accept `sslmode` (it uses `ssl` instead). The shared package auto-normalizes both the scheme and query parameters in `shared/database.py`.
 
 ### Root URL Redirect
 
