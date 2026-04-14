@@ -1,4 +1,7 @@
-from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
+from __future__ import annotations
+
+from typing import Any
+from urllib.parse import parse_qs, urlparse, urlunparse
 
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -8,33 +11,30 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import DeclarativeBase
 
-# asyncpg uses ``ssl`` instead of ``sslmode``.  Map common libpq values to the
-# boolean that asyncpg expects so the connection just works regardless of what
-# the cloud provider puts in DATABASE_URL.
-_SSLMODE_TO_SSL: dict[str, bool] = {
-    "require": True,
-    "verify-ca": True,
-    "verify-full": True,
-    "prefer": True,
-    "allow": True,
-    "disable": False,
-}
+# libpq sslmode values that mean "use SSL"
+_SSL_MODES = frozenset({"require", "verify-ca", "verify-full", "prefer", "allow"})
 
 
 class Base(DeclarativeBase):
     pass
 
 
-def _normalize_url(database_url: str) -> str:
-    """Ensure the URL uses an async-compatible driver and query params.
+def _normalize_url(database_url: str) -> tuple[str, dict[str, Any]]:
+    """Convert a libpq-style DATABASE_URL into an asyncpg-compatible one.
 
-    Cloud providers typically set DATABASE_URL with ``postgresql://`` or
-    ``postgresql+psycopg2://``, but ``create_async_engine`` requires an
-    async driver such as ``asyncpg``.
+    Cloud providers (including FastAPI Cloud) set DATABASE_URL with the
+    ``postgresql://`` scheme and libpq query parameters like ``sslmode``
+    and ``channel_binding``.  asyncpg does not accept these — it uses its
+    own keyword arguments (e.g. ``ssl``).
 
-    They also commonly append ``?sslmode=require``, which asyncpg does not
-    accept — it uses ``ssl`` instead.  This function converts the scheme
-    **and** the query parameters so the URL is fully asyncpg-compatible.
+    This function:
+    1. Rewrites the scheme to ``postgresql+asyncpg://``
+    2. Strips **all** query parameters (they are libpq-specific)
+    3. Returns ``connect_args`` with ``ssl=True`` when the original URL
+       requested an SSL mode
+
+    Returns:
+        A ``(url, connect_args)`` tuple ready for ``create_async_engine``.
     """
     if database_url.startswith(("postgresql://", "postgresql+psycopg2://")):
         database_url = database_url.replace("postgresql+psycopg2://", "postgresql+asyncpg://", 1)
@@ -43,19 +43,27 @@ def _normalize_url(database_url: str) -> str:
     parsed = urlparse(database_url)
     params = parse_qs(parsed.query)
 
-    if "sslmode" in params:
-        sslmode = params.pop("sslmode")[0]
-        ssl_value = _SSLMODE_TO_SSL.get(sslmode, True)
-        if ssl_value:
-            params["ssl"] = ["require"]
-        new_query = urlencode(params, doseq=True)
-        database_url = urlunparse(parsed._replace(query=new_query))
+    # Determine SSL requirement from the original sslmode param
+    connect_args: dict[str, Any] = {}
+    sslmode_values = params.get("sslmode", [])
+    if sslmode_values and sslmode_values[0] in _SSL_MODES:
+        connect_args["ssl"] = True
 
-    return database_url
+    # Strip all query params — they are libpq-specific and will cause
+    # TypeError in asyncpg (sslmode, channel_binding, etc.)
+    clean_url = urlunparse(parsed._replace(query=""))
+
+    return clean_url, connect_args
 
 
 def create_engine(database_url: str) -> AsyncEngine:
-    return create_async_engine(_normalize_url(database_url), pool_size=5, max_overflow=10)
+    url, connect_args = _normalize_url(database_url)
+    return create_async_engine(
+        url,
+        pool_size=5,
+        max_overflow=10,
+        connect_args=connect_args,
+    )
 
 
 def create_session_factory(engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
