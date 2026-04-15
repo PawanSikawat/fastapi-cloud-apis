@@ -1,12 +1,11 @@
 import pytest
 from httpx import ASGITransport, AsyncClient
 from itsdangerous import URLSafeSerializer
+from shared.middleware.cookie_auth import CookieToHeaderMiddleware
 from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import PlainTextResponse
 from starlette.routing import Route
-
-from email_validation.middleware.cookie_auth import CookieToHeaderMiddleware
 
 SECRET = "test-secret"
 SIGNER = URLSafeSerializer(SECRET, salt="api-key")

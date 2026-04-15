@@ -12,7 +12,7 @@ class CookieToHeaderMiddleware:
     """Read a signed 'api_key' cookie and inject it as an x-api-key header.
 
     For UI paths (except the login page), redirect to login when no valid
-    cookie is present.  API clients that already send the header are
+    cookie is present. API clients that already send the header are
     unaffected — the cookie is never used when the header exists.
     """
 
@@ -47,7 +47,6 @@ class CookieToHeaderMiddleware:
             await self.app(scope, receive, send)
             return
 
-        # No valid credential — redirect to login for UI paths
         if path.startswith(_UI_PREFIX) and path not in {_LOGIN_PATH, _LOGOUT_PATH}:
             response = RedirectResponse(_LOGIN_PATH)
             await response(scope, receive, send)

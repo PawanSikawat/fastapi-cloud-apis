@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from shared import (
     AuthMiddleware,
     ChannelDetectMiddleware,
+    CookieToHeaderMiddleware,
     MeteringMiddleware,
     RateLimitMiddleware,
     setup_shared,
@@ -15,7 +16,6 @@ from shared import (
 
 from email_validation.config import get_settings
 from email_validation.exceptions import AppError, app_exception_handler
-from email_validation.middleware.cookie_auth import CookieToHeaderMiddleware
 from email_validation.routes.ui import router as ui_router
 from email_validation.routes.validation import router as validation_router
 

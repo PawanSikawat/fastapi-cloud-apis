@@ -3,8 +3,7 @@ from unittest.mock import MagicMock
 import pytest
 from httpx import ASGITransport, AsyncClient
 from itsdangerous import URLSafeSerializer
-
-from email_validation.middleware.cookie_auth import CookieToHeaderMiddleware
+from shared.middleware.cookie_auth import CookieToHeaderMiddleware
 
 COOKIE_SECRET = "test-cookie-secret"
 SIGNER = URLSafeSerializer(COOKIE_SECRET, salt="api-key")
