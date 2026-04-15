@@ -972,7 +972,7 @@ requires-dist = [
     { name = "itsdangerous", specifier = ">=2.2.0" },
     { name = "jinja2", specifier = ">=3.1.0" },
     { name = "pydantic-settings", specifier = ">=2.7.0" },
-    { name = "shared", git = "https://github.com/PawanSikawat/fastapi-cloud-apis.git?subdirectory=shared&branch=main" },
+    { name = "shared", editable = "../../shared" },
     { name = "xhtml2pdf", specifier = ">=0.2.17" },
 ]
 
@@ -1514,14 +1514,37 @@ wheels = [
 [[package]]
 name = "shared"
 version = "0.1.0"
-source = { git = "https://github.com/PawanSikawat/fastapi-cloud-apis.git?subdirectory=shared&branch=main#931d417a20e4be0bdd4f7879ddd6c27f3fc596cc" }
+source = { editable = "../../shared" }
 dependencies = [
     { name = "asyncpg" },
     { name = "fastapi" },
+    { name = "itsdangerous" },
     { name = "pydantic-settings" },
     { name = "redis" },
     { name = "sqlalchemy", extra = ["asyncio"] },
     { name = "stripe" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "asyncpg", specifier = ">=0.30.0" },
+    { name = "fastapi", specifier = ">=0.115.0" },
+    { name = "itsdangerous", specifier = ">=2.2.0" },
+    { name = "pydantic-settings", specifier = ">=2.7.0" },
+    { name = "redis", specifier = ">=5.2.0" },
+    { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.0" },
+    { name = "stripe", specifier = ">=12.0.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "aiosqlite", specifier = ">=0.21.0" },
+    { name = "fakeredis", specifier = ">=2.26.0" },
+    { name = "httpx", specifier = ">=0.28.0" },
+    { name = "mypy", specifier = ">=1.14.0" },
+    { name = "pytest", specifier = ">=8.3.0" },
+    { name = "pytest-asyncio", specifier = ">=0.25.0" },
+    { name = "ruff", specifier = ">=0.9.0" },
 ]
 
 [[package]]

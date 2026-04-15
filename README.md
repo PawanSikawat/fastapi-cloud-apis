@@ -115,7 +115,9 @@ cd projects/qr-code-generator
 uv run fastapi cloud deploy
 ```
 
-FastAPI Cloud auto-discovers the `app` instance in `main.py`. The `shared/` package is installed automatically as a git dependency.
+FastAPI Cloud auto-discovers the `app` instance in `main.py`. Each project uses the
+repo-local `shared/` package as a path dependency, so shared infrastructure changes
+travel with the monorepo.
 
 ### 3. Configure environment variables
 

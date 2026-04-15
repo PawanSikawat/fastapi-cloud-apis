@@ -26,7 +26,7 @@ packages = ["email_validation"]
 allow-direct-references = true
 
 [tool.uv.sources]
-shared = { git = "https://github.com/PawanSikawat/fastapi-cloud-apis.git", subdirectory = "shared", branch = "main" }
+shared = { path = "../../shared", editable = true }
 
 [dependency-groups]
 dev = [
