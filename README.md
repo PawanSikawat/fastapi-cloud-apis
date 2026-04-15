@@ -45,6 +45,13 @@ All projects depend on the `shared/` package which provides:
 
 Each project runs independently. Pick one and follow its README, or use the commands below.
 
+## Starting A New API
+
+Use the shared starter path instead of bootstrapping from scratch:
+
+- Playbook: [docs/new-api-playbook.md](/Users/c-sikawats/Documents/GitHub/Personal/fastapi-cloud-apis/docs/new-api-playbook.md)
+- Template: [templates/api-starter/README.md](/Users/c-sikawats/Documents/GitHub/Personal/fastapi-cloud-apis/templates/api-starter/README.md)
+
 ### Run Locally
 
 ```bash

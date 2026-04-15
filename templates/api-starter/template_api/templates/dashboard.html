@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Starter API{% endblock %}
+{% block content %}
+<section>
+    <h1>Starter API Dashboard</h1>
+    <p>Replace this page with the UI for your real product.</p>
+
+    <form id="example-form">
+        <label for="value">Example value</label>
+        <input id="value" name="value" type="text" required placeholder="hello world">
+        <button type="submit">Send</button>
+    </form>
+
+    <pre id="result"></pre>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    const form = document.getElementById("example-form");
+    const result = document.getElementById("result");
+
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const value = document.getElementById("value").value;
+        const response = await fetch("/v1/example/ping", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ value: value }),
+        });
+
+        const data = await response.json();
+        result.textContent = JSON.stringify(data, null, 2);
+    });
+})();
+</script>
+{% endblock %}

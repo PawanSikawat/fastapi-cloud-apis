@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Login — Starter API{% endblock %}
+{% block content %}
+<section>
+    <h1>Starter API Login</h1>
+    <p>Enter an API key to access the example dashboard.</p>
+    {% if error %}
+    <p role="alert">{{ error }}</p>
+    {% endif %}
+    <form method="POST" action="/ui/login">
+        <label for="api_key">API Key</label>
+        <input id="api_key" name="api_key" type="password" required placeholder="sk_...">
+        <button type="submit">Login</button>
+    </form>
+</section>
+{% endblock %}
