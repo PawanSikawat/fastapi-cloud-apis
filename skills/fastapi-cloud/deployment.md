@@ -84,7 +84,8 @@ def get_settings() -> Settings:
 - **Hardcoding connection strings.** Even for development. Use `.env` files locally, FastAPI Cloud dashboard in production.
 - **Multiple FastAPI apps in one deployment.** Each project deploys separately. Don't try to serve multiple APIs from one app.
 - **Committing `.env` files.** `.env` is in `.gitignore`. Only `.env.example` (with placeholder values) is committed.
-- **Installing shared as a git submodule.** Use a git URL dependency: `shared` with `[tool.uv.sources]` pointing to the repo's `shared/` subdirectory.
+- **Copy-pasting or separately packaging shared code.** Use a local path dependency:
+  `shared` with `[tool.uv.sources]` pointing to `../../shared`.
 
 ## Checklist
 

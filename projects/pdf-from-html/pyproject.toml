@@ -33,7 +33,7 @@ allow-direct-references = true
 exclude-dependencies = ["pycairo"]
 
 [tool.uv.sources]
-shared = { git = "https://github.com/PawanSikawat/fastapi-cloud-apis.git", subdirectory = "shared", branch = "main" }
+shared = { path = "../../shared", editable = true }
 
 [dependency-groups]
 dev = [

@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 # Deploy a project to FastAPI Cloud.
 #
-# Pulls the latest shared package from main before deploying.
-#
 # Usage: ./deploy.sh <project-name>
 #   e.g. ./deploy.sh qr-code-generator
 
@@ -18,9 +16,6 @@ if [ ! -d "$PROJECT_DIR" ]; then
 fi
 
 cd "$PROJECT_DIR"
-
-echo "Updating shared package to latest main..."
-uv lock --upgrade-package shared
 
 echo "Deploying $PROJECT_NAME to FastAPI Cloud..."
 uv run fastapi cloud deploy

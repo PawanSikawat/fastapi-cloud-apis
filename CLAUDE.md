@@ -343,7 +343,6 @@ python -c "import secrets; print(f'sk_{secrets.token_urlsafe(32)}')"
 ./deploy.sh <project-name>
 
 # Or manually from project directory:
-uv lock --upgrade-package shared
 uv run fastapi cloud deploy
 ```
 
