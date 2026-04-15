@@ -2,11 +2,16 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Status note (2026-04-15):** This plan reflects the original
+> Playwright/Chromium build plan. The current implementation in
+> `projects/pdf-from-html/` ships with `xhtml2pdf` instead. Treat this file as
+> historical implementation planning, not current source-of-truth behavior.
+
 **Goal:** Build a production-grade API that converts raw HTML or URLs into PDFs using Playwright/Chromium, integrated with shared auth/billing/metering infrastructure.
 
-**Architecture:** Single POST endpoint accepts `source` ("raw"/"url") + `content` + optional PDF options. Playwright renders via a pooled browser, returns PDF bytes as StreamingResponse. Shared middleware handles auth, rate limiting, metering.
+**Architecture:** Original plan: single POST endpoint accepts `source` ("raw"/"url") + `content` + optional PDF options. Playwright renders via a pooled browser, returns PDF bytes as StreamingResponse. Current implementation differs and uses `xhtml2pdf` without a browser pool.
 
-**Tech Stack:** FastAPI, Playwright (Chromium), Pydantic v2, asyncio, shared infrastructure (auth, billing, metering, Redis, PostgreSQL)
+**Tech Stack:** Planned stack: FastAPI, Playwright (Chromium), Pydantic v2, asyncio, shared infrastructure (auth, billing, metering, Redis, PostgreSQL). Current shipped renderer: `xhtml2pdf`.
 
 **Spec:** `docs/superpowers/specs/2026-04-13-pdf-from-html-design.md`
 
@@ -26,10 +31,10 @@
 | `src/pdf_from_html/routes/__init__.py` | Package marker |
 | `src/pdf_from_html/routes/generate.py` | POST /v1/generate/pdf endpoint |
 | `src/pdf_from_html/services/__init__.py` | Package marker |
-| `src/pdf_from_html/services/browser_pool.py` | BrowserPool — semaphore-guarded context manager |
-| `src/pdf_from_html/services/pdf_service.py` | generate() — orchestrates Playwright render |
+| `src/pdf_from_html/services/browser_pool.py` | Planned BrowserPool for Playwright version; not present in current implementation |
+| `src/pdf_from_html/services/pdf_service.py` | PDF generation service |
 | `src/pdf_from_html/dependencies/__init__.py` | Package marker |
-| `tests/conftest.py` | App fixture, mock browser pool, test client |
+| `tests/conftest.py` | App fixture and test client |
 | `tests/test_routes/test_generate.py` | Route-level tests (mock service layer) |
 | `tests/test_services/test_pdf_service.py` | Service + options-builder tests |
 | `tests/test_services/test_browser_pool.py` | Pool lifecycle tests |
@@ -59,7 +64,7 @@ build-backend = "hatchling.build"
 [project]
 name = "pdf-from-html"
 version = "0.1.0"
-description = "PDF from HTML API — generate PDFs from raw HTML or URLs using Chromium"
+description = "PDF from HTML API — generate PDFs from raw HTML or URLs using xhtml2pdf"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi[standard]>=0.115.0",

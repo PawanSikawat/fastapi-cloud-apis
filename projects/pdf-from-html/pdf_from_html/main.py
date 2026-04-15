@@ -56,8 +56,8 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="PDF from HTML API",
         description=(
-            "Generate PDFs from raw HTML or URLs using WeasyPrint. "
-            "High-fidelity rendering with full CSS3 support."
+            "Generate PDFs from raw HTML or URLs using xhtml2pdf. "
+            "Server-side HTML/CSS rendering without a browser runtime."
         ),
         version="0.1.0",
         lifespan=lifespan,

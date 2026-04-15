@@ -1,14 +1,14 @@
 # PDF from HTML API
 
-Generate PDFs from raw HTML or URLs using Chromium with pixel-perfect rendering. Full CSS3 and JavaScript support via Playwright.
+Generate PDFs from raw HTML or URLs using server-side HTML/CSS rendering via `xhtml2pdf`.
 
 ## Features
 
 - **HTML to PDF** -- send raw HTML, get a PDF back
 - **URL to PDF** -- render any public URL as a PDF
-- **Pixel-perfect** -- Chromium-based rendering with full CSS3/JS support
+- **HTML/CSS rendering** -- convert raw HTML into PDFs without a browser dependency
 - **Configurable** -- page size, margins, headers, footers, print background
-- **Browser pool** -- reusable Chromium instances for fast response times
+- **Simple server runtime** -- no browser pool or Playwright install required
 - **Web UI** -- browser-based interface for quick conversions
 
 ## API
@@ -40,9 +40,6 @@ curl -X POST http://localhost:8000/v1/generate/pdf \
 ```bash
 # Install dependencies
 uv sync
-
-# Install Chromium for Playwright
-uv run playwright install chromium
 
 # Set environment variables
 export DATABASE_URL="sqlite+aiosqlite:///./dev.db"
@@ -90,7 +87,7 @@ uv run mypy pdf_from_html/
 
 | Package | Purpose |
 |---------|---------|
-| playwright | Chromium browser automation for PDF rendering |
+| xhtml2pdf | Server-side HTML to PDF rendering |
 | jinja2 | Web UI templates |
 | itsdangerous | Signed session cookies |
 | shared | Auth, billing, metering, rate limiting |

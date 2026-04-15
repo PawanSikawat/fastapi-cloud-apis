@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "pdf-from-html"
 version = "0.1.0"
-description = "PDF from HTML API — generate PDFs from raw HTML or URLs using Chromium"
+description = "PDF from HTML API — generate PDFs from raw HTML or URLs using xhtml2pdf"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]>=0.115.0",

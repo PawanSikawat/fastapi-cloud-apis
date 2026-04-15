@@ -7,7 +7,7 @@ A collection of production-grade FastAPI APIs, each integrating with different c
 | Project | Description | Endpoints |
 |---------|-------------|-----------|
 | [QR Code Generator](projects/qr-code-generator/) | Generate QR codes with optional logo embedding (PNG/SVG) | `POST /v1/generate/qrcode` |
-| [PDF from HTML](projects/pdf-from-html/) | Generate PDFs from raw HTML or URLs using Chromium | `POST /v1/generate/pdf` |
+| [PDF from HTML](projects/pdf-from-html/) | Generate PDFs from raw HTML or URLs using HTML/CSS rendering | `POST /v1/generate/pdf` |
 | [Email Validation](projects/email-validation/) | Validate emails with syntax, MX, SMTP, disposable, and role-based checks | `POST /v1/validate/email`, `POST /v1/validate/email/batch` |
 
 Each project is self-contained with its own dependencies, test suite, and web UI.
