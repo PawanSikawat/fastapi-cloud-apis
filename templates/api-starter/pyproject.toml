@@ -1,0 +1,55 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "api-starter"
+version = "0.1.0"
+description = "Starter API template for new FastAPI Cloud projects"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.115.0",
+    "pydantic-settings>=2.7.0",
+    "jinja2>=3.1.0",
+    "itsdangerous>=2.2.0",
+    "shared",
+]
+
+[tool.fastapi]
+entrypoint = "template_api.main:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["template_api"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.uv.sources]
+shared = { git = "https://github.com/PawanSikawat/fastapi-cloud-apis.git", subdirectory = "shared", branch = "main" }
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.25.0",
+    "pytest-cov>=6.0.0",
+    "mypy>=1.14.0",
+    "ruff>=0.9.0",
+    "fakeredis>=2.26.0",
+    "aiosqlite>=0.21.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "A", "SIM", "TCH"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+plugins = ["pydantic.mypy"]
