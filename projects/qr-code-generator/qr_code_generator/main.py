@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from shared import (
     AuthMiddleware,
     ChannelDetectMiddleware,
+    CookieToHeaderMiddleware,
     MeteringMiddleware,
     RateLimitMiddleware,
     setup_shared,
@@ -15,7 +16,6 @@ from shared import (
 
 from qr_code_generator.config import get_settings
 from qr_code_generator.exceptions import AppError, app_exception_handler
-from qr_code_generator.middleware.cookie_auth import CookieToHeaderMiddleware
 from qr_code_generator.routes.generate import router as generate_router
 from qr_code_generator.routes.ui import router as ui_router
 

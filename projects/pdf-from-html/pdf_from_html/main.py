@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from shared import (
     AuthMiddleware,
     ChannelDetectMiddleware,
+    CookieToHeaderMiddleware,
     MeteringMiddleware,
     RateLimitMiddleware,
     setup_shared,
@@ -15,7 +16,6 @@ from shared import (
 
 from pdf_from_html.config import get_settings
 from pdf_from_html.exceptions import AppError, app_exception_handler
-from pdf_from_html.middleware.cookie_auth import CookieToHeaderMiddleware
 from pdf_from_html.routes.generate import router as generate_router
 from pdf_from_html.routes.ui import router as ui_router
 
