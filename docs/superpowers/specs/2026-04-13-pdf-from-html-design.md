@@ -5,15 +5,23 @@
 **Pattern:** Generator (parameters in, file out)
 **Catalog score:** 4.15 (Tier 1)
 
+> **Status note (2026-04-15):** This spec captures the original intended
+> Playwright/Chromium architecture. The current implementation in
+> `projects/pdf-from-html/` uses `xhtml2pdf` instead. Treat this file as design
+> history unless and until the browser-based renderer is intentionally restored.
+
 ## Summary
 
-A production-grade API that converts raw HTML or a URL into a PDF file. Uses Playwright/Chromium headless for pixel-perfect rendering. Synchronous request-response — one POST, one PDF back. Integrates with the shared infrastructure for auth, rate limiting, metering, and billing.
+A production-grade API that converts raw HTML or a URL into a PDF file. The
+original design targeted Playwright/Chromium for pixel-perfect browser rendering.
+The currently shipped implementation uses `xhtml2pdf` for server-side HTML/CSS
+rendering. It remains a synchronous request-response API: one POST, one PDF back.
 
 ## Decisions
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| Rendering engine | Playwright/Chromium | Full browser engine, pixel-perfect CSS3/JS. Users paying for a PDF API expect browser-grade fidelity. |
+| Rendering engine | Playwright/Chromium (planned) | Original target architecture for browser-grade CSS/JS fidelity; not the current shipped renderer. |
 | Input model | Single endpoint, `source` discriminator | Cleaner than two endpoints. `source: "raw"` or `"url"` with `content` field. |
 | Response model | Synchronous, PDF bytes | Generator pattern: return file directly. 30s timeout covers 95%+ of real-world renders. |
 | Batch support | Not in v1 | Single conversion covers primary use case. Merge endpoint is a v2 candidate. |
@@ -74,8 +82,8 @@ All errors return JSON: `{"error": "ERROR_CODE", "detail": "Human-readable messa
 | 422 | `CONTENT_TOO_LARGE` | Raw HTML exceeds 5MB |
 | 429 | `RATE_LIMIT_EXCEEDED` | Rate limit hit (shared middleware) |
 | 429 | `QUOTA_EXCEEDED` | Monthly quota exhausted (shared middleware) |
-| 502 | `RENDER_FAILED` | Chromium crash or page load failure |
-| 503 | `POOL_EXHAUSTED` | All browser contexts in use |
+| 502 | `RENDER_FAILED` | HTML-to-PDF render failure |
+| 503 | `POOL_EXHAUSTED` | Planned browser pool exhausted (not used by current implementation) |
 | 504 | `RENDER_TIMEOUT` | Render exceeded timeout (default 30s) |
 
 ## Architecture

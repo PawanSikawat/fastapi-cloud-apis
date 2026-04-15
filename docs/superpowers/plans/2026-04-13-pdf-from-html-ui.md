@@ -927,8 +927,6 @@ from pdf_from_html.exceptions import AppError, app_exception_handler
 from pdf_from_html.middleware.cookie_auth import CookieToHeaderMiddleware
 from pdf_from_html.routes.generate import router as generate_router
 from pdf_from_html.routes.ui import router as ui_router
-from pdf_from_html.services.browser_pool import BrowserPool
-
 _STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 # Auth skip paths: default shared paths + public UI paths
@@ -951,11 +949,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     async with setup_shared(app, settings):
         pw = await async_playwright().start()
         browser = await pw.chromium.launch()
-        app.state.browser_pool = BrowserPool(browser, settings.browser_pool_size)
         try:
             yield
         finally:
-            await app.state.browser_pool.close()
             await pw.stop()
 
 
@@ -965,8 +961,8 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="PDF from HTML API",
         description=(
-            "Generate PDFs from raw HTML or URLs using Chromium. "
-            "Pixel-perfect rendering with full CSS3 and JavaScript support."
+            "Generate PDFs from raw HTML or URLs using xhtml2pdf. "
+            "Server-side HTML/CSS rendering without a browser runtime."
         ),
         version="0.1.0",
         lifespan=lifespan,
